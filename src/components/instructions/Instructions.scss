@@ -1,0 +1,33 @@
+.instructions {
+	margin: 0;
+	padding-left: 12px;
+	display: flex;
+	flex-direction: column;
+	list-style-type: none;
+	gap: 12px;
+	counter-reset: step;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.instructions li {
+		transition: none !important;
+		transform: none !important;
+		opacity: 1 !important;
+	}
+}
+
+.instructions li {
+	opacity: 0;
+	transform: translateX(40px) scale(0.98);
+	will-change: opacity, transform;
+	transition:
+		transform 420ms cubic-bezier(.2, .9, .28, 1),
+		opacity 360ms cubic-bezier(.2, .9, .28, 1);
+	transition-delay: calc(var(--i) * 120ms);
+}
+
+/* when parent becomes visible */
+.instructions.visible li {
+	opacity: 1;
+	transform: translateX(0) scale(1);
+}

@@ -1,0 +1,85 @@
+@import url(/src/colors.css);
+
+.range {
+  -webkit-appearance: none;
+  /* remove default */
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 8px;
+  background: var(--light);
+  /* fallback background (will be overridden inline to show fill) */
+  outline: none;
+  margin: 8px 0;
+}
+
+/* WebKit track */
+.range::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 8px;
+  background: transparent;
+  /* we use input background for fill */
+}
+
+/* WebKit thumb */
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 0;
+  margin-top: -5px;
+  cursor: grab;
+}
+
+/* Firefox track & thumb */
+.range::-moz-range-track {
+  height: 10px;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 0;
+  cursor: grab;
+}
+
+/* IE / Edge (legacy) */
+.range::-ms-track {
+  height: 10px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+.range::-ms-fill-lower {
+  background: transparent;
+  border-radius: 8px;
+}
+
+.range::-ms-fill-upper {
+  background: transparent;
+  border-radius: 8px;
+}
+
+.range::-ms-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 0;
+  cursor: grab;
+}
+
+/* Focus state */
+.range:focus::-webkit-slider-thumb,
+.range:focus::-moz-range-thumb,
+.range:focus::-ms-thumb {
+  cursor: grabbing;
+}

@@ -1,0 +1,29 @@
+/* Dracula color theme 🧛🏻 */
+:root {
+	--darkest: #282a36;
+	--darker: #44475a;
+	--dark: #6272a4;
+	--light: #f8f8f2;
+	--cyan: #00bcd4;
+	--green: #4caf50;
+	--orange: #ff9800;
+	--pink: #e91e63;
+	--purple: #9c27b0;
+	--red: #f44336;
+	--yellow: #ffeb3b;
+}
+
+/* light mode overrides */
+.light-mode {
+	--darkest: #f8f8f2;
+	--darker: #e0e0e0;
+	--dark: #c0c0c0;
+	--light: #282a36;
+	--cyan: #00bcd4;
+	--green: #4caf50;
+	--orange: #ff9800;
+	--pink: #e91e63;
+	--purple: #9c27b0;
+	--red: #f44336;
+	--yellow: #ffeb3b;
+}

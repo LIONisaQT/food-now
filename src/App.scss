@@ -1,0 +1,172 @@
+@import url(./colors.css);
+
+.food-now {
+	max-width: 600px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	background: var(--darkest);
+	color: var(--light);
+
+	.banner {
+		font-family: 'Sriracha', sans-serif;
+		position: fixed;
+		width: 100%;
+		box-sizing: border-box;
+		background-color: var(--red);
+		top: 0;
+		left: 0;
+		padding: 16px 8px;
+		text-align: center;
+		box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+		z-index: 101;
+	}
+
+	.criteria {
+		display: flex;
+		flex-direction: column;
+
+		.criteria-section {
+			height: calc(100dvh - 120px);
+			padding: 80px 8px 40px;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+
+			>section {
+				flex: 1;
+				min-height: 0;
+				justify-content: center;
+			}
+
+			.title {
+				text-align: center;
+			}
+
+			.intro-wrapper {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+				padding-left: 24px;
+			}
+
+			.section-button {
+				font-family: 'Lexend', sans-serif;
+				flex: 0 0 auto;
+				width: auto;
+				padding: 8px 16px;
+				border-radius: 32px;
+				border: none;
+				font-size: clamp(0.875rem, 2.5vw, 1rem);
+				line-height: 1.5;
+				transition: all 0.2s ease;
+				cursor: pointer;
+				background: var(--cyan);
+				color: var(--light);
+
+				&:disabled {
+					background: var(--darker);
+					color: var(--dark);
+					cursor: not-allowed;
+				}
+			}
+
+			.prev {
+				align-self: flex-start;
+			}
+
+			.next {
+				align-self: flex-end;
+			}
+
+			.check-open {
+				padding-top: 20px;
+				padding-left: 24px;
+				display: flex;
+				flex-direction: row;
+				gap: 4px;
+			}
+		}
+
+		.sliders-body {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+
+			.sliders-section-container {
+				display: flex;
+				flex-direction: column;
+
+				.title {
+					padding-bottom: 16px;
+				}
+
+				.body {
+					display: flex;
+					flex-direction: column;
+					padding: 0 48px;
+					align-items: center;
+
+					.custom-slider {
+						width: 100%;
+					}
+				}
+			}
+		}
+	}
+
+	.ext-link-button {
+		background: var(--cyan);
+		text-decoration: none;
+		font-weight: normal;
+		padding: 8px 16px;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		border-radius: 24px;
+		cursor: pointer;
+
+		&:hover {
+			filter: brightness(0.9);
+		}
+
+		img {
+			height: clamp(1.25rem, 5vw, 1.75rem);
+		}
+
+		p {
+			color: var(--light);
+		}
+	}
+
+	.food-now-button {
+		font-family: 'Lexend', sans-serif;
+		padding: 8px 16px;
+		border-radius: 32px;
+		border: none;
+		font-size: clamp(1.25rem, 5vw, 1.75rem);
+		line-height: 1.2;
+		transition: all 0.5s ease;
+		cursor: pointer;
+		background-color: var(--cyan);
+		color: var(--light);
+
+		&:disabled {
+			background-color: var(--darker);
+			color: var(--dark);
+			cursor: not-allowed;
+		}
+	}
+
+	.checkbox {
+		accent-color: var(--cyan);
+	}
+
+	.error-text {
+		color: var(--red);
+	}
+
+	.success-text {
+		color: var(--green);
+	}
+}

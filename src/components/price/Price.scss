@@ -1,0 +1,27 @@
+@import url(/src/colors.css);
+
+.range-body {
+  // TODO: Range component's thumbs can exceed width of container, pls fix
+  margin-bottom: 12px;
+
+  .range-label {
+    padding-bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  .render-track {
+    height: 10px;
+    width: 100%;
+    border-radius: 4px;
+  }
+
+  .render-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--cyan);
+  }
+}

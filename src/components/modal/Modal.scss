@@ -1,0 +1,217 @@
+@import url(/src/colors.css);
+
+.loading-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 100;
+  pointer-events: none;
+  /* prevent blocking input when hidden */
+
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal {
+    max-width: 600px;
+    margin: 0 auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -150%);
+    /* start above screen */
+    z-index: 101;
+    background-color: var(--darkest);
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: 8px;
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+
+    .loading-text {
+      font-size: 1.75rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 1;
+      }
+    }
+
+    .result {
+      width: 100%;
+      height: 100%;
+      padding: 80px 24px 36px;
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+
+      .no-result {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .result-data {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+
+        .photo-container {
+          width: 100%;
+          height: 200px;
+          overflow: hidden;
+          position: relative;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block
+          }
+        }
+
+        .name {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: block;
+          max-width: 100%;
+          line-height: 1.25;
+        }
+
+        .details {
+          padding: 0 12px;
+
+          .vicinity {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            max-width: 100%;
+          }
+        }
+
+        .review {
+          span {
+            font-weight: bold;
+          }
+
+          .author {
+            color: var(--red);
+          }
+
+          .rating {
+            color: var(--green);
+          }
+
+          .time {
+            color: var(--orange);
+          }
+
+          .review-text-wrapper {
+            margin-top: 4px;
+            max-height: calc(15dvh + 16px);
+            border-radius: 8px;
+            background-color: var(--darker);
+            overflow: hidden;
+            padding: 8px;
+            box-sizing: border-box;
+
+            .review-text {
+              padding: 0px 8px;
+              overflow-y: auto;
+              max-height: 15dvh;
+              line-height: 1.4;
+              scrollbar-color: var(--light) transparent;
+            }
+          }
+        }
+
+        .link-group {
+          padding-top: 16px;
+          display: flex;
+          gap: 8px;
+          justify-content: center;
+        }
+      }
+
+      .button-group {
+        margin-top: auto;
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 8px;
+        width: 100%;
+
+        button {
+          font-family: 'Lexend', sans-serif;
+          padding: 8px 16px;
+          border-radius: 32px;
+          border: none;
+          font-size: clamp(0.875rem, 2.5vw, 1rem);
+          line-height: 1.5;
+          transition: all 0.5s ease;
+          background-color: var(--cyan);
+          color: var(--light);
+          cursor: pointer;
+
+          &:disabled {
+            background: var(--darker);
+            color: var(--dark);
+            cursor: not-allowed;
+          }
+        }
+
+        .primary {
+          flex: 3
+        }
+
+        .secondary {
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  &.show {
+    pointer-events: auto;
+
+    .background {
+      opacity: 1;
+    }
+
+    .modal {
+      transform: translate(-50%, -50%);
+      opacity: 1;
+    }
+  }
+}
