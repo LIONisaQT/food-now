@@ -15,9 +15,8 @@ export interface CuisineType {
 }
 
 function App() {
-	const [placesService, setPlacesService] =
-		useState<google.maps.places.PlacesService | null>(null);
-	const [results, setResults] = useState<google.maps.places.PlaceResult[]>([]);
+	const [placesReady, setPlacesReady] = useState(false);
+	const [results, setResults] = useState<google.maps.places.Place[]>([]);
 	const [error, setError] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [cuisines, setCuisines] = useState<CuisineType[]>([]);
@@ -33,7 +32,7 @@ function App() {
 		window.scrollTo(0, 0);
 
 		const prefersDark = window.matchMedia(
-			"(prefers-color-scheme: dark)"
+			"(prefers-color-scheme: dark)",
 		).matches;
 
 		// Optional: use time-based logic if no system preference
@@ -55,13 +54,7 @@ function App() {
 			libraries: ["places"],
 		});
 
-		loader.importLibrary("places").then(() => {
-			// Dummy div, since we’re not rendering a map
-			const service = new google.maps.places.PlacesService(
-				document.createElement("div")
-			);
-			setPlacesService(service);
-		});
+		loader.importLibrary("places").then(() => setPlacesReady(true));
 	}, []);
 
 	const searchNearbyRestaurants = async () => {
@@ -79,8 +72,8 @@ function App() {
 		// 	return;
 		// }
 
-		if (!placesService) {
-			setError("PlacesService not ready yet.");
+		if (!placesReady) {
+			setError("Places search is not ready yet.");
 			return;
 		}
 
@@ -89,39 +82,50 @@ function App() {
 			return;
 		}
 
-		const promises = cuisines.map(
-			(cuisine) =>
-				new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
-					const request: google.maps.places.PlaceSearchRequest = {
-						location: latLng,
-						radius: distance,
-						type: cuisine.type ?? "restaurant",
-						keyword: cuisine.keyword,
-						minPriceLevel: price[0],
-						maxPriceLevel: price[1],
-						openNow: checkOpen,
-					};
-
-					placesService.nearbySearch(request, (res, status) => {
-						if (status === google.maps.places.PlacesServiceStatus.OK && res) {
-							resolve(res.slice(0, 10));
-						} else {
-							reject(status);
-						}
-					});
-				})
+		const { Place } = (await google.maps.importLibrary(
+			"places",
+		)) as google.maps.PlacesLibrary;
+		const promises = cuisines.map((cuisine) =>
+			Place.searchByText({
+				textQuery: `${cuisine.keyword} restaurant`,
+				fields: [
+					"id",
+					"displayName",
+					"location",
+					"rating",
+					"userRatingCount",
+					"priceLevel",
+				],
+				locationBias: { center: latLng, radius: distance },
+				maxResultCount: 20,
+				minRating: rating === 5 ? 4.5 : rating,
+				isOpenNow: checkOpen,
+			}),
 		);
 
 		try {
 			const resultsArrays = await Promise.all(promises);
-			const combinedResults = resultsArrays.flat();
-
-			// Cap rating because 5* only is limiting
-			const cappedRating = rating === 5 ? 4.5 : rating;
-
-			const filteredResults = combinedResults.filter(
-				(place) => place.rating && place.rating >= cappedRating
-			);
+			const filteredResults = resultsArrays
+				.flatMap((response) => response.places)
+				.filter((place) => {
+					const priceLevel = [
+						"FREE",
+						"INEXPENSIVE",
+						"MODERATE",
+						"EXPENSIVE",
+						"VERY_EXPENSIVE",
+					].indexOf(place.priceLevel ?? "");
+					return (
+						priceLevel === -1 ||
+						(priceLevel >= price[0] && priceLevel <= price[1])
+					);
+				})
+				.filter(
+					(place, index, places) =>
+						place.id &&
+						places.findIndex((candidate) => candidate.id === place.id) ===
+							index,
+				);
 			setResults(filteredResults);
 			localStorage.setItem("cachedResults", JSON.stringify(filteredResults));
 		} catch (status) {
@@ -247,15 +251,15 @@ function App() {
 					<button
 						className="food-now-button"
 						onClick={searchNearbyRestaurants}
-						disabled={!placesService || cuisines.length === 0 || loading}
+						disabled={!placesReady || cuisines.length === 0 || loading}
 					>
 						{cuisines.length === 0
 							? "No cuisines selected!"
-							: !placesService
-							? "Couldn't get location."
-							: loading
-							? "Getting restaurants..."
-							: "Get Food Now!"}
+							: !placesReady
+								? "Couldn't get location."
+								: loading
+									? "Getting restaurants..."
+									: "Get Food Now!"}
 					</button>
 				</section>
 			</section>

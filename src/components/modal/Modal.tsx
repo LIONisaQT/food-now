@@ -6,7 +6,7 @@ const DEBOUNCE_TIMER = 3;
 interface LoadingProps {
 	searchFinished: boolean;
 	isLoading: boolean;
-	results: google.maps.places.PlaceResult[];
+	results: google.maps.places.Place[];
 	onRestart: () => void;
 }
 
@@ -16,50 +16,31 @@ export default function Modal({
 	results,
 	onRestart,
 }: LoadingProps) {
-	const [selected, setSelected] =
-		useState<google.maps.places.PlaceResult | null>(null);
+	const [selected, setSelected] = useState<google.maps.places.Place | null>(
+		null,
+	);
 	const [loadingDetails, setLoadingDetails] = useState(false);
 	const [debounceTimer, setDebounceTimer] = useState(0);
 
-	const getRandomRestaurant = (places: google.maps.places.PlaceResult[]) =>
+	const getRandomRestaurant = (places: google.maps.places.Place[]) =>
 		places[Math.floor(Math.random() * places.length)];
 
-	const getRestaurantDetails = (
-		restaurant: google.maps.places.PlaceResult
-	): Promise<google.maps.places.PlaceResult> => {
-		return new Promise((resolve, reject) => {
-			if (!restaurant.place_id) {
-				reject(new Error("Restaurant does not have a place_id"));
-				return;
-			}
-
-			const service = new google.maps.places.PlacesService(
-				document.createElement("div")
-			);
-
-			const request: google.maps.places.PlaceDetailsRequest = {
-				placeId: restaurant.place_id,
-				fields: [
-					"name",
-					"vicinity",
-					"geometry",
-					"rating",
-					"user_ratings_total",
-					"reviews",
-					"photos",
-					"opening_hours",
-					"place_id",
-				],
-			};
-
-			service.getDetails(request, (details, status) => {
-				if (status === google.maps.places.PlacesServiceStatus.OK && details) {
-					resolve(details);
-				} else {
-					reject(new Error(`getDetails failed: ${status}`));
-				}
-			});
+	const getRestaurantDetails = async (
+		restaurant: google.maps.places.Place,
+	): Promise<google.maps.places.Place> => {
+		const { place } = await restaurant.fetchFields({
+			fields: [
+				"displayName",
+				"formattedAddress",
+				"location",
+				"rating",
+				"userRatingCount",
+				"reviews",
+				"photos",
+				"regularOpeningHours",
+			],
 		});
+		return place;
 	};
 
 	const selectRandomRestaurant = useCallback(async () => {
@@ -102,8 +83,8 @@ export default function Modal({
 	const getMapLink = () => {
 		if (!selected) return "#";
 
-		const latLng = selected.geometry?.location;
-		const name = encodeURIComponent(selected.name || "");
+		const latLng = selected.location;
+		const name = encodeURIComponent(selected.displayName || "");
 
 		const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
@@ -117,9 +98,9 @@ export default function Modal({
 			}
 		}
 
-		if (selected.place_id) {
+		if (selected.id) {
 			// Desktop or non-mobile: use place_id
-			return `https://www.google.com/maps/search/?api=1&query=${name}&query_place_id=${selected.place_id}`;
+			return `https://www.google.com/maps/search/?api=1&query=${name}&query_place_id=${selected.id}`;
 		}
 
 		if (latLng) {
@@ -131,9 +112,9 @@ export default function Modal({
 		return "#";
 	};
 
-	const getYelpLink = (place: google.maps.places.PlaceResult): string => {
-		const name = place.name || "";
-		const address = place.vicinity || "";
+	const getYelpLink = (place: google.maps.places.Place): string => {
+		const name = place.displayName || "";
+		const address = place.formattedAddress || "";
 		const query = encodeURIComponent(`${name} ${address}`);
 		return `https://www.yelp.com/search?find_desc=${query}`;
 	};
@@ -142,30 +123,31 @@ export default function Modal({
 		if (!selected) return;
 
 		const today = new Date().getDay(); // Sunday = 0, Monday = 1, ...
-		const todayPeriod = selected.opening_hours?.periods?.find(
-			(period) => period.open?.day === today
+		const todayPeriod = selected.regularOpeningHours?.periods?.find(
+			(period) => period.open?.day === today,
 		);
 
 		if (!todayPeriod) return null;
 
-		// If there's no close, assume it's open 24 hours
 		if (!todayPeriod.close) {
 			return <span> | Open 24 hours</span>;
 		}
 
-		// Format time (e.g., "1730" → "5:30 PM")
-		const formatTime = (time: string) => {
-			const hours = parseInt(time.substring(0, 2), 10);
-			const minutes = time.substring(2) || "00";
+		const formatTime = (hours: number, minutes: number) => {
 			const date = new Date();
-			date.setHours(hours, parseInt(minutes, 10));
+			date.setHours(hours, minutes);
 			return date.toLocaleTimeString([], {
 				hour: "numeric",
 				minute: "2-digit",
 			});
 		};
 
-		return <span> | Closes @ {formatTime(todayPeriod.close.time)}</span>;
+		return (
+			<span>
+				| Closes @{" "}
+				{formatTime(todayPeriod.close.hour, todayPeriod.close.minute)}
+			</span>
+		);
 	};
 
 	return (
@@ -194,18 +176,18 @@ export default function Modal({
 								{selected.photos && selected.photos.length > 0 && (
 									<div className="photo-container">
 										<img
-											src={selected.photos[0].getUrl()}
-											alt={selected.name}
+											src={selected.photos[0].getURI()}
+											alt={selected.displayName || "Restaurant"}
 										/>
 									</div>
 								)}
-								<h1 className="name">{selected.name}</h1>
+								<h1 className="name">{selected.displayName}</h1>
 								<section className="details">
-									<p className="vicinity">{selected.vicinity}</p>
+									<p className="vicinity">{selected.formattedAddress}</p>
 									<p>
 										{selected.rating}★
-										{selected.user_ratings_total && (
-											<span> ({selected.user_ratings_total} reviews)</span>
+										{selected.userRatingCount && (
+											<span> ({selected.userRatingCount} reviews)</span>
 										)}
 										{renderClosingTime()}
 									</p>
@@ -214,7 +196,11 @@ export default function Modal({
 									<section className="review">
 										<p>
 											<span className="author">
-												{selected.reviews[0].author_name.split(" ")[0]}
+												{
+													selected.reviews[0].authorAttribution?.displayName?.split(
+														" ",
+													)[0]
+												}
 											</span>{" "}
 											rated{" "}
 											<span className="rating">
@@ -222,7 +208,7 @@ export default function Modal({
 											</span>
 											{", and wrote "}
 											<span className="time">
-												{selected.reviews[0].relative_time_description}
+												{selected.reviews[0].relativePublishTimeDescription}
 											</span>
 											:
 										</p>
