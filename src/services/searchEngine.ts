@@ -45,6 +45,7 @@ export const placesSearchEngine: SearchEngine = {
 						"rating",
 						"userRatingCount",
 						"priceLevel",
+						"photos",
 					],
 					locationBias: { center: location, radius: distance },
 					maxResultCount: 20,

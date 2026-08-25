@@ -176,7 +176,10 @@ export default function Modal({
 								{selected.photos && selected.photos.length > 0 && (
 									<div className="photo-container">
 										<img
-											src={selected.photos[0].getURI()}
+											src={selected.photos[0].getURI({
+												maxWidth: 800,
+												maxHeight: 600,
+											})}
 											alt={selected.displayName || "Restaurant"}
 										/>
 									</div>
