@@ -8,6 +8,7 @@ import Rating from "./components/rating/Rating";
 import Distance from "./components/distance/Distance";
 import Modal from "./components/modal/Modal";
 import Instructions from "./components/instructions/Instructions";
+import { placesSearchEngine } from "./services/searchEngine";
 
 export interface CuisineType {
 	keyword: string;
@@ -82,52 +83,17 @@ function App() {
 			return;
 		}
 
-		const { Place } = (await google.maps.importLibrary(
-			"places",
-		)) as google.maps.PlacesLibrary;
-		const promises = cuisines.map((cuisine) =>
-			Place.searchByText({
-				textQuery: `${cuisine.keyword} restaurant`,
-				fields: [
-					"id",
-					"displayName",
-					"location",
-					"rating",
-					"userRatingCount",
-					"priceLevel",
-				],
-				locationBias: { center: latLng, radius: distance },
-				maxResultCount: 20,
-				minRating: rating === 5 ? 4.5 : rating,
-				isOpenNow: checkOpen,
-			}),
-		);
-
 		try {
-			const resultsArrays = await Promise.all(promises);
-			const filteredResults = resultsArrays
-				.flatMap((response) => response.places)
-				.filter((place) => {
-					const priceLevel = [
-						"FREE",
-						"INEXPENSIVE",
-						"MODERATE",
-						"EXPENSIVE",
-						"VERY_EXPENSIVE",
-					].indexOf(place.priceLevel ?? "");
-					return (
-						priceLevel === -1 ||
-						(priceLevel >= price[0] && priceLevel <= price[1])
-					);
-				})
-				.filter(
-					(place, index, places) =>
-						place.id &&
-						places.findIndex((candidate) => candidate.id === place.id) ===
-							index,
-				);
-			setResults(filteredResults);
-			localStorage.setItem("cachedResults", JSON.stringify(filteredResults));
+			const searchResults = await placesSearchEngine.search({
+				cuisines,
+				location: latLng,
+				distance,
+				priceRange: price as [number, number],
+				minimumRating: rating,
+				openNow: checkOpen,
+			});
+			setResults(searchResults);
+			localStorage.setItem("cachedResults", JSON.stringify(searchResults));
 		} catch (status) {
 			setError(`Search failed: ${status}`);
 		} finally {
