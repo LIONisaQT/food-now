@@ -75,7 +75,7 @@ const defaultOptions: CuisineOption[] = [
 		name: "Filipino",
 		value: "filipino",
 		image:
-			"https://makeyourasia.com/templates/yootheme/cache/09/3-09a03ff0.jpeg",
+			"https://gatorcare.org/wordpress/files/2024/04/Filipino-Food-Month-Food-for-Thought-Top-Image-578x754.png",
 	},
 	{
 		name: "French",
@@ -128,13 +128,13 @@ const defaultOptions: CuisineOption[] = [
 		name: "Middle Eastern",
 		value: "middle_eastern_restaurant",
 		image:
-			"https://ik.imagekit.io/munchery/blog/tr:w-768/introduction-to-middle-eastern-home-cooking.jpeg",
+			"https://olivetreemenu.com/wp-content/uploads/2020/12/Middle-Eastern-Cuisine-Auburn-WA.jpg",
 	},
 	{
 		name: "Thai",
 		value: "thai_restaurant",
 		image:
-			"https://ik.imagekit.io/munchery/blog/tr:w-768/the-10-most-iconic-thai-dishes-and-how-to-make-them-at-home.jpeg",
+			"https://assets.bonappetit.com/photos/57afb7eaf1c801a1038bd380/1:1/w_841,h_841,c_limit/pad-thai-940.jpg",
 	},
 	{
 		name: "Vietnamese",
@@ -170,7 +170,7 @@ export default function Cuisine({
 					}
 				});
 			},
-			{ threshold: 0.15 }
+			{ threshold: 0.15 },
 		);
 
 		observer.observe(el);
@@ -184,7 +184,7 @@ export default function Cuisine({
 				<div className="options-grid" ref={gridRef}>
 					{defaultOptions.map((option, i) => {
 						const isSelected = selectedCuisines.find(
-							(c) => c.keyword === option.value
+							(c) => c.keyword === option.value,
 						);
 						return (
 							<div
