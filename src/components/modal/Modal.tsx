@@ -187,7 +187,7 @@ export default function Modal({
 									<p>
 										{selected.rating}★
 										{selected.userRatingCount && (
-											<span> ({selected.userRatingCount} reviews)</span>
+											<span> ({selected.userRatingCount} reviews) </span>
 										)}
 										{renderClosingTime()}
 									</p>
