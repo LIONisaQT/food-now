@@ -50,7 +50,7 @@ function App() {
 		}
 
 		const loader = new Loader({
-			apiKey: import.meta.env.VITE_GMAPS_API_KEY,
+			apiKey: import.meta.env.VITE_GMAPS_API_KEY.trim(),
 			version: "weekly",
 			libraries: ["places"],
 		});
